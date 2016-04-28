@@ -2,6 +2,7 @@ import csv
 import sys
 import tweepy
 import nltk
+from array import *
 from nltk.stem import *
 from nltk.corpus import sentiwordnet as swn
 
@@ -13,24 +14,19 @@ ACCESS_TOKEN_SECRET = "HZAQU8fpXc7WKqypHc3agDLjAoboO89jqioTznVpNSbRl"
 auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
 auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
 api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
-
-#with open('testdata.csv', "r", encoding='utf-8') as csvfile:
-    #spamreader = csv.reader(csvfile, delimiter=' ', quotechar='|')
-    #row_count = sum(1 for row in spamreader)
-    #for i in range(10):
-        #print(', '.join(spamreader.__next__()).encode('utf-8'))
-    #for row in spamreader:
-    #    print(', '.join(row).encode('utf-8'))
     
-time = ["" for x in range(110)] 
-screen_names = ["" for x in range(110)]
-tweets = ["" for x in range(110)]
-retweets = [-1 for x in range(110)]
-num_followers = [-1 for x in range(110)]
-sentiment = [-1 for x in range(110)]
+time = ["" for x in range(1000)] 
+screen_names = ["" for x in range(1000)]
+tweets = ["" for x in range(1000)]
+retweets = [-1 for x in range(1000)]
+num_followers = [-1 for x in range(1000)]
+sentiment = [-1 for x in range(1000)]
+ids = [-1 for x in range(1000)]
+map_followers = {}
 count = 0
 
-with open('testdata.csv', encoding='utf-8', 'ignore') as csvfile:
+# read data from csv into arrays
+with open('blm.csv', encoding='ascii', errors = "ignore") as csvfile:
     reader = csv.DictReader(csvfile)
     for row in reader:
         screen_names[count] = row['Screen Name'].replace("@","")
@@ -39,13 +35,9 @@ with open('testdata.csv', encoding='utf-8', 'ignore') as csvfile:
         retweets[count] = row['RT']
         count = count + 1
 
-index = 1
-user_num = 0
-num_foll = 0
-
-<<<<<<< HEAD
-# get sentiment score of tweets
+# traverse through list of tweets to obtain tweet sentiment and 
 for x in range(0, len(tweets)):
+    # get sentiment score of tweets
     tokens = nltk.word_tokenize(tweets[x])
     tagged = nltk.pos_tag(tokens)	# tag tokens for part of speech
     pscore = 0
@@ -58,27 +50,49 @@ for x in range(0, len(tweets)):
         elif 'VB' in tagged[i][1] and len(list(swn.senti_synsets(tagged[i][0],'v'))) > 0:
             pscore+=(list(swn.senti_synsets(tagged[i][0],'v'))[0]).pos_score()
             nscore+=(list(swn.senti_synsets(tagged[i][0],'v'))[0]).neg_score()
-        elif 'JJ' in tagged[i][1] and len(list(swn.senti_synsets(tagged[i][0],'a'))) > 0:
-            pscore+=(list(swn.senti_synsets(tagged[i][0],'a'))[0]).pos_score()
-            nscore+=(list(swn.senti_synsets(tagged[i][0],'a'))[0]).neg_score()
         elif 'RB' in tagged[i][1] and len(list(swn.senti_synsets(tagged[i][0],'r'))) > 0:
             pscore+=(list(swn.senti_synsets(tagged[i][0],'r'))[0]).pos_score()
             nscore+=(list(swn.senti_synsets(tagged[i][0],'r'))[0]).neg_score()
-		
+        elif 'JJ' in tagged[i][1] and len(list(swn.senti_synsets(tagged[i][0],'a'))) > 0:
+            pscore+=(list(swn.senti_synsets(tagged[i][0],'a'))[0]).pos_score()
+            nscore+=(list(swn.senti_synsets(tagged[i][0],'a'))[0]).neg_score()
     sentiment[x] = (pscore - nscore)
 
-    #gets number of followers of each user who tweeted with the same hashtag within the time frame after original user's tweet and end of the dataset
-    followers = tweepy.Cursor(api.followers, screen_name=screen_names[x]).items()
-    while screen_names[index] != screen_names[x] and index != 110:
-        if screen_names[index] in followers:
+# get associated user id from screen name for all tweets
+for x in range(0, len(tweets)):
+    try:
+        temp = api.get_user(screen_name = screen_names[x])
+    except tweepy.error.TweepError:
+        pass
+    ids[x] = temp.id   
+
+# get list of follower ids
+for x in range(0, len(tweets)): 
+    temp_ids = []
+    if (screen_names[x] not in map_followers.keys()):
+        try:
+            for page in tweepy.Cursor(api.followers_ids, screen_name = screen_names[x]).pages():
+                temp_ids.extend(page)
+        except tweepy.error.TweepError:
+            pass
+    map_followers[screen_names[x]] = temp_ids
+
+index = 1
+num_foll = 0
+
+# cross reference followers with num people who tweeted with the same hashtag
+for x in range(0, len(tweets)):
+    followers = map_followers[screen_names[x]]
+    while screen_names[index] != screen_names[x] and index != 1000:
+        if ids[index] in followers:
             num_foll = num_foll+1
         index = index + 1
     num_followers[x] = num_foll
-    user_num = user_num + 1
-    index = user_num + 1
+    index = x + 1
     num_foll = 0
 
-print(sentiment)
-print (num_followers)
-
-
+# write to csv file
+with open('write1.csv', 'w', newline = '') as csvfile:
+    for x in range(0, len(tweets)):
+        writer = csv.writer(csvfile, delimiter = ',', quotechar = '|', quoting = csv.QUOTE_MINIMAL)
+        writer.writerow([screen_names[x], retweets[x] ,time[x],sentiment[x],num_followers[x]])
