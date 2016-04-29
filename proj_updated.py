@@ -84,10 +84,13 @@ num_foll = 0
 # cross reference followers with num people who tweeted with the same hashtag
 for x in range(0, len(tweets)):
     followers = map_followers[screen_names[x]]
-    while screen_names[index] != screen_names[x] and index != 100:
+    for id in ids:
+    if id in followers:
+        num_foll = num_foll + 1 
+    '''while screen_names[index] != screen_names[x] and index != 100:
         if ids[index] in followers:
             num_foll = num_foll+1
-        index = index + 1
+        index = index + 1'''
     num_followers[x] = num_foll
     index = x + 1
     num_foll = 0
