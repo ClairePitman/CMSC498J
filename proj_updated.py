@@ -16,13 +16,13 @@ auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
 auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
 api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
     
-time = ["" for x in range(1000)] 
-screen_names = ["" for x in range(1000)]
-tweets = ["" for x in range(1000)]
-retweets = [-1 for x in range(1000)]
-num_followers = [-1 for x in range(1000)]
-sentiment = [-1 for x in range(1000)]
-ids = [-1 for x in range(1000)]
+time = ["" for x in range(100)] 
+screen_names = ["" for x in range(100)]
+tweets = ["" for x in range(100)]
+retweets = [-1 for x in range(100)]
+num_followers = [-1 for x in range(100)]
+sentiment = [-1 for x in range(100)]
+ids = [-1 for x in range(100)]
 map_followers = {}
 count = 0
 
@@ -84,7 +84,7 @@ num_foll = 0
 # cross reference followers with num people who tweeted with the same hashtag
 for x in range(0, len(tweets)):
     followers = map_followers[screen_names[x]]
-    while screen_names[index] != screen_names[x] and index != 1000:
+    while screen_names[index] != screen_names[x] and index != 100:
         if ids[index] in followers:
             num_foll = num_foll+1
         index = index + 1
