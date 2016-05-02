@@ -7,34 +7,41 @@ from array import *
 from nltk.stem import *
 from nltk.corpus import sentiwordnet as swn
 
-CONSUMER_KEY = "ECgRrXkQt551Y75hWaEAhuLVB"
-CONSUMER_SECRET = "cHbSmCHPJNdpWNlDHUEsQ5vVGKWqaURiSHyKgCsyEf74G7F7c2"
-ACCESS_TOKEN = "393600504-kNU18ts1ml7eOpXczWjqfTH2UGM0LqMyRRvkiryu"
-ACCESS_TOKEN_SECRET = "HZAQU8fpXc7WKqypHc3agDLjAoboO89jqioTznVpNSbRl"
+CONSUMER_KEY = "oDphrYhTXiYU4WDZim9p9lUYE"
+CONSUMER_SECRET = "2n9QGqiMZ2BVAImsQSwv2Aeng93aXc5EUPhr55QyfrqpXrwe0D"
+ACCESS_TOKEN = "2267861995-MghGrmkwkeAiDnNi6BNbpQO5gJeQOqpfVkuME6j"
+ACCESS_TOKEN_SECRET = "Q6h8qlIK7B1PWT7nEx3nxsrHAVISAwkgz1ttxmLtodGxo"
 
 auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
 auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
 api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
-    
+
 time = ["" for x in range(100)] 
-screen_names = ["" for x in range(100)]
+screen_names = ["" for x in range(int(sys.argv[2]))]
 tweets = ["" for x in range(100)]
 retweets = [-1 for x in range(100)]
+original_followers = [-1 for x in range(100)]
 num_followers = [-1 for x in range(100)]
 sentiment = [-1 for x in range(100)]
-ids = [-1 for x in range(100)]
+ids = [-1 for x in range(int(sys.argv[2]))]
 map_followers = {}
+map_followers_rt = {}
 count = 0
 
 # read data from csv into arrays
 with open(sys.argv[1], encoding='ascii', errors = "ignore") as csvfile:
     reader = csv.DictReader(csvfile)
     for row in reader:
-        screen_names[count] = row['Screen Name'].replace("@","")
-        time[count] = row['Time']
-        tweets[count] = row['Tweet']
-        retweets[count] = row['RT']
-        count = count + 1
+        if count < len(tweets):
+            screen_names[count] = row['Screen Name'].replace("@","")
+            time[count] = row['Time']
+            tweets[count] = row['Tweet']
+            retweets[count] = row['RT']
+            original_followers[count] = row['Followers']
+            count = count + 1
+        else:
+            screen_names[count] = row['Screen Name'].replace("@","")
+            count = count + 1
 
 # traverse through list of tweets to obtain tweet sentiment and 
 for x in range(0, len(tweets)):
@@ -60,7 +67,7 @@ for x in range(0, len(tweets)):
     sentiment[x] = (pscore - nscore)
 
 # get associated user id from screen name for all tweets
-for x in range(0, len(tweets)):
+for x in range(0, len(ids)):
     try:
         temp = api.get_user(screen_name = screen_names[x])
     except tweepy.error.TweepError:
@@ -78,25 +85,30 @@ for x in range(0, len(tweets)):
             pass
     map_followers[screen_names[x]] = temp_ids
 
-index = 1
+index = 0
 num_foll = 0
 
 # cross reference followers with num people who tweeted with the same hashtag
 for x in range(0, len(tweets)):
+    temp = [-1 for x in range(600)]
+    
     followers = map_followers[screen_names[x]]
     for id in ids:
-    if id in followers:
-        num_foll = num_foll + 1 
-    '''while screen_names[index] != screen_names[x] and index != 100:
-        if ids[index] in followers:
-            num_foll = num_foll+1
-        index = index + 1'''
+        if id in followers:
+            num_foll = num_foll + 1
+            temp[index] = id
+            index = index + 1
     num_followers[x] = num_foll
-    index = x + 1
     num_foll = 0
+    map_followers_rt[screen_names[x]] = list(set(temp))
+    index = 0
 
 # write to csv file
-with open('write1.csv', 'w', newline = '') as csvfile:
+with open('feelthebern_final.csv', 'w', newline = '') as csvfile:
     for x in range(0, len(tweets)):
         writer = csv.writer(csvfile, delimiter = ',', quotechar = '|', quoting = csv.QUOTE_MINIMAL)
-        writer.writerow([screen_names[x], retweets[x] ,time[x],sentiment[x],num_followers[x]])
+        writer.writerow([screen_names[x], retweets[x] ,time[x], sentiment[x], original_followers[x], num_followers[x], ids[x], map_followers_rt[screen_names[x]]])
+    for y in range(100, len(ids)):
+        writer = csv.writer(csvfile, delimiter = ',', quotechar = '|', quoting = csv.QUOTE_MINIMAL)
+        writer.writerow(['', '','', '','', '', ids[x]]) 
+
