@@ -7,10 +7,10 @@ from array import *
 from nltk.stem import *
 from nltk.corpus import sentiwordnet as swn
 
-CONSUMER_KEY = "oDphrYhTXiYU4WDZim9p9lUYE"
-CONSUMER_SECRET = "2n9QGqiMZ2BVAImsQSwv2Aeng93aXc5EUPhr55QyfrqpXrwe0D"
-ACCESS_TOKEN = "2267861995-MghGrmkwkeAiDnNi6BNbpQO5gJeQOqpfVkuME6j"
-ACCESS_TOKEN_SECRET = "Q6h8qlIK7B1PWT7nEx3nxsrHAVISAwkgz1ttxmLtodGxo"
+CONSUMER_KEY = "ECgRrXkQt551Y75hWaEAhuLVB"
+CONSUMER_SECRET = "cHbSmCHPJNdpWNlDHUEsQ5vVGKWqaURiSHyKgCsyEf74G7F7c2"
+ACCESS_TOKEN = "393600504-kNU18ts1ml7eOpXczWjqfTH2UGM0LqMyRRvkiryu"
+ACCESS_TOKEN_SECRET = "HZAQU8fpXc7WKqypHc3agDLjAoboO89jqioTznVpNSbRl"
 
 auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
 auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
@@ -104,11 +104,11 @@ for x in range(0, len(tweets)):
     index = 0
 
 # write to csv file
-with open('feelthebern_final.csv', 'w', newline = '') as csvfile:
+with open('makeamericagreat_final.csv', 'w', newline = '') as csvfile:
     for x in range(0, len(tweets)):
         writer = csv.writer(csvfile, delimiter = ',', quotechar = '|', quoting = csv.QUOTE_MINIMAL)
         writer.writerow([screen_names[x], retweets[x] ,time[x], sentiment[x], original_followers[x], num_followers[x], ids[x], map_followers_rt[screen_names[x]]])
     for y in range(100, len(ids)):
         writer = csv.writer(csvfile, delimiter = ',', quotechar = '|', quoting = csv.QUOTE_MINIMAL)
-        writer.writerow(['', '','', '','', '', ids[x]]) 
+        writer.writerow(['', '','', '','', '', ids[y]]) 
 
