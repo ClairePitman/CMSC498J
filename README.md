@@ -23,12 +23,15 @@ run
 # MACHINE LEARNING
 
 install sklearn, numpy, and matplotlib
+
 For the linear model run
+
 in shell
 
 	> python mllin.py
 
 For the svm model run
+
 in shell
 
 	> python mlsvm.py
