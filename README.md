@@ -16,7 +16,10 @@ in pop-up window, download
 		-> sentinet
 		-> wordnet
 
+# MACHINE LEARNING
+
 run
+
 	> proj_updated.py csv_to_process_filename csv_to_write_filename number_users
 
-# MACHINE LEARNING
+
