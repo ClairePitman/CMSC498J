@@ -13,7 +13,7 @@ writeX=write1[:,np.array([False,False, True, True, True, False])]
 trainLabels= writeY
 trainData=writeX
 
-print regr.fit (trainData, trainLabels)
+regr.fit (trainData, trainLabels)
 
 # The coefficients
 print('Coefficients: \n', regr.coef_)
@@ -23,9 +23,9 @@ testY=test[:,5]
 testX=test[:,np.array([False,False, True, True, True, False])]
 regr.predict(testX)
 testY
-print (regr.predict(testX))
-print trainLabels
-print testY
+#print (regr.predict(testX))
+#print trainLabels
+#print testY
 print("Residual sum of squares: %.2f"
       % np.mean((regr.predict(testX) - testY) ** 2))
 # Explained variance score: 1 is perfect prediction

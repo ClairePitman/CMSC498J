@@ -15,7 +15,7 @@ writeX=write1[:,np.array([False,False, True, True, True, False])]
 trainLabels= writeY
 trainData=writeX
 
-print regr.fit (trainData, trainLabels)
+regr.fit (trainData, trainLabels)
 
 
 test = np.genfromtxt('test.csv',delimiter=',',usecols=(0,1,2,3,4,5))
@@ -23,7 +23,7 @@ testY=test[:,5]
 testX=test[:,np.array([False,False, True, True, True, False])]
 regr.predict(testX)
 testY
-print (regr.predict(testX))
+#print (regr.predict(testX))
 print("Residual sum of squares: %.2f"
       % np.mean((regr.predict(testX) - testY) ** 2))
 # Explained variance score: 1 is perfect prediction
